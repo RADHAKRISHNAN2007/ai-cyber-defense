@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>AI Cyber Defense V2</title>
+<style>
+:root{--bg:#040812;--card:#0a1220;--line:#18324b;--cyan:#00d9ff;--green:#22ef91;--yellow:#ffd166;--red:#ff4268;--white:#eef9ff;--muted:#91a9bb}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 50% -10%,#12365a,#040812 45%);color:var(--white);font-family:Arial,sans-serif}.app{max-width:480px;margin:auto;min-height:100vh;padding-bottom:76px}
+header{padding:18px;display:flex;justify-content:space-between}.brand{font-weight:800}.brand b{color:var(--cyan)}
+.card{margin:12px 16px;padding:17px;border:1px solid var(--line);border-radius:18px;background:#091221eF}.muted{color:var(--muted);font-size:13px;line-height:1.45}
+h2{font-size:18px;margin:3px 0 12px}.input{width:100%;padding:14px;border:1px solid var(--line);background:#050d18;color:white;border-radius:12px;font-size:14px}.btn{width:100%;padding:14px;border:0;border-radius:12px;background:linear-gradient(90deg,#009ddd,#00d9ff);font-weight:800;margin-top:11px;color:#00141d}
+.result{margin-top:14px;padding:15px;border-radius:15px;border:1px solid var(--line)}.status{font-size:22px;font-weight:900}.safe{color:var(--green)}.sus{color:var(--yellow)}.bad{color:var(--red)}.unknown{color:var(--cyan)}
+.score{text-align:center;font-size:42px;font-weight:900;margin:12px}.bar{height:9px;background:#172536;border-radius:10px;overflow:hidden}.fill{height:100%;width:0;background:var(--cyan);transition:.4s}.row{display:flex;justify-content:space-between;margin:9px 0;font-size:13px}.tag{padding:5px 8px;border-radius:20px;background:#10263a;color:var(--cyan);font-size:11px}.hidden{display:none}
+.pipeline p{margin:10px 0}.ai{border-left:3px solid var(--cyan);padding-left:10px;line-height:1.5}nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:min(480px,100%);display:flex;justify-content:space-around;padding:11px 4px;background:#06101ddd;border-top:1px solid var(--line);backdrop-filter:blur(10px)}nav button{background:none;border:0;color:#8fa5b5;font-size:11px}nav button.active{color:var(--cyan)}
+.screen{display:none}.screen.active{display:block}
+</style>
+</head>
+<body>
+<div class="app">
+<header><div class="brand">AI <b>CYBER DEFENSE</b></div><div>🛡️</div></header>
+
+<section id="scanner" class="screen active">
+<div class="card">
+<h2>Threat Scanner V2</h2>
+<div class="muted">Classifies URLs into Safe, Suspicious, Malicious, or Unverified. Demo heuristics are used until a real threat-intelligence service is connected.</div>
+<br><input id="url" class="input" placeholder="https://example.com">
+<button class="btn" onclick="scan()">🔎 Analyze URL</button>
+<div id="result" class="result hidden"></div>
+</div>
+<div class="card pipeline"><h2>Analysis Pipeline</h2>
+<p>① URL structure <span class="tag">READY</span></p>
+<p>② Domain indicators <span class="tag">READY</span></p>
+<p>③ Redirect/reputation lookup <span class="tag">BACKEND NEXT</span></p>
+<p>④ AI risk explanation <span class="tag">READY</span></p>
+<p>⑤ Defensive response <span class="tag">READY</span></p>
+</div>
+</section>
+
+<section id="home" class="screen">
+<div class="card"><h2>System Status</h2><div class="status safe">● Defensive mode active</div><p class="muted">No remote systems are attacked or modified.</p></div>
+<div class="card"><h2>Quick Action</h2><button class="btn" onclick="show('scanner')">Scan a Link</button></div>
+</section>
+
+<section id="ai" class="screen">
+<div class="card"><h2>🤖 AI Security Assistant</h2><p class="ai">I explain scan results and guide the human operator. High-impact actions require human approval.</p><p class="ai">If protection cannot be verified: <b>Stop and go back.</b></p><p class="ai">If protection is verified: <b>Proceed to the next stage.</b></p></div>
+</section>
+
+<section id="reports" class="screen">
+<div class="card"><h2>Reports</h2><p class="muted">Confirmed malicious indicators can be collected into an evidence report for legitimate reporting/takedown channels.</p><button class="btn" onclick="alert('Demo report prepared. Real submission will be added with the backend.')">Prepare Report</button></div>
+</section>
+
+<section id="settings" class="screen"><div class="card"><h2>Settings</h2><p>Mode: <span class="tag">Defensive</span></p><p>Language: <span class="tag">English</span></p><p>Theme: <span class="tag">Futuristic</span></p></div></section>
+</div>
+<nav><button onclick="show('home',this)">⌂<br>Home</button><button class="active" onclick="show('scanner',this)">⌕<br>Scanner</button><button onclick="show('ai',this)">◉<br>AI</button><button onclick="show('reports',this)">▣<br>Reports</button><button onclick="show('settings',this)">⚙<br>Settings</button></nav>
+
+<script>
+function show(id,el){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');document.querySelectorAll('nav button').forEach(b=>b.classList.remove('active'));if(el)el.classList.add('active')}
+function scan(){
+ let u=document.getElementById('url').value.trim(),r=document.getElementById('result');
+ if(!/^https?:\/\/.+/i.test(u)){r.className='result';r.innerHTML='<b class="bad">Invalid URL</b><p>Enter a complete http/https URL.</p>';return}
+ let x=u.toLowerCase(), risk=10, reasons=[];
+ try{let p=new URL(u); if(p.hostname.includes('xn--')){risk+=30;reasons.push('Punycode domain detected')} if(p.hostname.split('.').length>3){risk+=10;reasons.push('Multiple subdomains')} if(p.hostname.includes('@')){risk+=35;reasons.push('Suspicious user-info pattern')} if(p.protocol!=='https:'){risk+=15;reasons.push('Not using HTTPS')}}catch(e){risk=90;reasons.push('Malformed URL')}
+ const words=['login','verify','account','password','wallet','gift','free','update','secure-login','signin','confirm'];
+ let hits=words.filter(w=>x.includes(w)); if(hits.length){risk+=Math.min(35,hits.length*9);reasons.push('Social-engineering keywords: '+hits.join(', '))}
+ if(/(bit\.ly|tinyurl\.com|t\.co|is\.gd|cutt\.ly)\//i.test(x)){risk+=12;reasons.push('URL shortener detected')}
+ risk=Math.min(99,risk);
+ let status,cls,ai;
+ if(risk>=70){status='MALICIOUS / HIGH RISK';cls='bad';ai='Do not open or submit credentials. Contain and report after independent verification.'}
+ else if(risk>=40){status='SUSPICIOUS';cls='sus';ai='Treat this URL as untrusted until reputation and redirect checks confirm otherwise.'}
+ else if(risk<=15){status='LOW RISK — NOT VERIFIED SAFE';cls='safe';ai='No strong local indicators were found. This is not a guarantee of safety.'}
+ else{status='UNVERIFIED';cls='unknown';ai='Local checks are inconclusive. A real threat-intelligence lookup is required.'}
+ r.className='result';r.innerHTML='<div class="status '+cls+'">'+status+'</div><div class="score">'+risk+'/100</div><div class="bar"><div class="fill" style="width:'+risk+'%;background:'+(risk>=70?'var(--red)':risk>=40?'var(--yellow)':'var(--cyan)')+'"></div></div><p><b>Indicators</b></p><p>'+(reasons.length?reasons.map(a=>'• '+a).join('<br>'):'• No strong local indicators')+'</p><p class="ai"><b>AI:</b> '+ai+'</p><button class="btn" onclick="defend()">Start Defensive Verification</button>';
+}
+function defend(){document.getElementById('result').innerHTML+='<p class="ai"><b>Defense:</b> Safe verification stage started. This prototype does not attack or delete the remote site.</p><p class="warn">Next: connect a real reputation/threat-intelligence backend.</p>'}
+</script>
+</body>
+</html>
